@@ -10,7 +10,7 @@ Source0:             https://rubygems.org/gems/%{gem_name}-%{version}.gem
 Source1:             https://github.com/puma/%{gem_name}/archive/v%{version}.tar.gz
 # Set the default cipher list "PROFILE=SYSTEM".
 # https://fedoraproject.org/wiki/Packaging:CryptoPolicies
-Patch2:              rubygem-puma-3.6.0-fedora-crypto-policy-cipher-list.patch
+Patch0:              rubygem-puma-3.6.0-fedora-crypto-policy-cipher-list.patch
 BuildRequires:       openssl-devel ruby(release) rubygems-devel ruby-devel rubygem(rack)
 BuildRequires:       rubygem(minitest)
 %if %{with ragel}
@@ -30,7 +30,7 @@ Documentation for %{name}.
 
 %prep
 %setup -q -n  %{gem_name}-%{version} -b 1
-%patch2 -p1
+%patch0 -p1
 %if %{with ragel}
 rm -f ext/puma_http11/http11_parser.c
 ragel ext/puma_http11/http11_parser.rl -C -G2 -I ext/puma_http11 \
