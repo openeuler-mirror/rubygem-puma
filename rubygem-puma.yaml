@@ -1,0 +1,4 @@
+version_control: github
+src_repo: puma/puma
+tag_prefix: "puma-"
+separator: "."
