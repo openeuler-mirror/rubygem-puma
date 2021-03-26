@@ -1,7 +1,7 @@
 %global gem_name puma
 %bcond_with ragel
 Name:                rubygem-%{gem_name}
-Version:             3.12.4
+Version:             3.12.6
 Release:             1
 Summary:             A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 License:             BSD
@@ -64,6 +64,7 @@ sed -i "/require 'minitest\/retry'/ s/^/#/" test/helper.rb
 sed -i "/Minitest::Retry/ s/^/#/" test/helper.rb
 sed -i '/^  def test_timeout_in_data_phase$/a\
     skip "Unstable test"' test/test_puma_server.rb
+sed -i "s/X_FORWARDED_PROTO/X-FORWARDED-PROTO/g" test/test_puma_server.rb
 sed -i '/^  def test_control_url$/a\
     skip "Unstable test"' test/test_pumactl.rb
 sed -i '/^  def test_ssl_v3_rejection$/a\
@@ -95,5 +96,11 @@ popd
 %{gem_instdir}/tools
 
 %changelog
+* Wed Feb 03 2021 shinwell_hu <micromotive@qq.com> - 3.12.6-1
+- Upgrade to 3.12.6 to fix following known CVEs
+  CVE-2020-11077
+  CVE-2020-11076
+- Workaround test failure on x forwarded protol
+
 * Thu Aug 20 2020 luoshengwei <luoshengwei@huawei.com> - 3.12.4-1
 - package init
