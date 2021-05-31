@@ -2,7 +2,7 @@
 %bcond_with ragel
 Name:                rubygem-%{gem_name}
 Version:             3.12.6
-Release:             1
+Release:             2
 Summary:             A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 License:             BSD
 URL:                 http://puma.io
@@ -11,6 +11,8 @@ Source1:             https://github.com/puma/%{gem_name}/archive/v%{version}.tar
 # Set the default cipher list "PROFILE=SYSTEM".
 # https://fedoraproject.org/wiki/Packaging:CryptoPolicies
 Patch0:              rubygem-puma-3.6.0-fedora-crypto-policy-cipher-list.patch
+Patch1:              CVE-2021-29509.patch
+
 BuildRequires:       openssl-devel ruby(release) rubygems-devel ruby-devel rubygem(rack)
 BuildRequires:       rubygem(minitest)
 %if %{with ragel}
@@ -31,6 +33,8 @@ Documentation for %{name}.
 %prep
 %setup -q -n  %{gem_name}-%{version} -b 1
 %patch0 -p1
+%patch1 -p1
+
 %if %{with ragel}
 rm -f ext/puma_http11/http11_parser.c
 ragel ext/puma_http11/http11_parser.rl -C -G2 -I ext/puma_http11 \
@@ -96,6 +100,9 @@ popd
 %{gem_instdir}/tools
 
 %changelog
+* Mon May 31 2021 wangyue <wangyue92@huawei.com>  - 3.12.6-2
+- Fix CVE-2021-29509
+
 * Wed Feb 03 2021 shinwell_hu <micromotive@qq.com> - 3.12.6-1
 - Upgrade to 3.12.6 to fix following known CVEs
   CVE-2020-11077
