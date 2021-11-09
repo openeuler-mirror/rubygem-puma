@@ -1,20 +1,20 @@
 %global gem_name puma
 %bcond_with ragel
 Name:                rubygem-%{gem_name}
-Version:             3.12.6
-Release:             2
+Version:             4.3.9
+Release:             1
 Summary:             A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 License:             BSD
 URL:                 http://puma.io
 Source0:             https://rubygems.org/gems/%{gem_name}-%{version}.gem
-Source1:             https://github.com/puma/%{gem_name}/archive/v%{version}.tar.gz
+Source1:             https://github.com/puma/%{gem_name}/archive/refs/tags/v%{version}.tar.gz
 # Set the default cipher list "PROFILE=SYSTEM".
 # https://fedoraproject.org/wiki/Packaging:CryptoPolicies
 Patch0:              rubygem-puma-3.6.0-fedora-crypto-policy-cipher-list.patch
-Patch1:              CVE-2021-29509.patch
 
 BuildRequires:       openssl-devel ruby(release) rubygems-devel ruby-devel rubygem(rack)
 BuildRequires:       rubygem(minitest)
+BuildRequires: 	     rubygem(nio4r)
 %if %{with ragel}
 BuildRequires:       %{_bindir}/ragel
 %endif
@@ -33,7 +33,6 @@ Documentation for %{name}.
 %prep
 %setup -q -n  %{gem_name}-%{version} -b 1
 %patch0 -p1
-%patch1 -p1
 
 %if %{with ragel}
 rm -f ext/puma_http11/http11_parser.c
@@ -64,17 +63,23 @@ find %{buildroot}%{gem_instdir}/bin -type f | \
 pushd .%{gem_instdir}
 ln -s %{_builddir}/%{gem_name}-%{version}/test test
 ln -s %{_builddir}/%{gem_name}-%{version}/examples examples
-sed -i "/require 'minitest\/retry'/ s/^/#/" test/helper.rb
+sed -i -e "/require..minitest\/\(retry\|proveit\)./ s/^/#/" test/helper.rb
 sed -i "/Minitest::Retry/ s/^/#/" test/helper.rb
+sed -i '/prove_it!/ s/^/#/' test/helper.rb
 sed -i '/^  def test_timeout_in_data_phase$/a\
     skip "Unstable test"' test/test_puma_server.rb
-sed -i "s/X_FORWARDED_PROTO/X-FORWARDED-PROTO/g" test/test_puma_server.rb
 sed -i '/^  def test_control_url$/a\
     skip "Unstable test"' test/test_pumactl.rb
 sed -i '/^  def test_ssl_v3_rejection$/a\
     skip' test/test_puma_server_ssl.rb
-sed -i '/^  def test_term_signal_exit_code_in_clustered_mode$/a\
-    skip "Clustered server does not stop properly"' test/test_integration.rb
+sed -i '/^  def test_usr1_all_respond_unix$/a\
+    skip' test/test_integration_cluster.rb
+sed -i '/^  def test_usr1_all_respond_tcp$/a\
+    skip' test/test_integration_cluster.rb
+sed -i '/^  def test_term_closes_listeners_unix$/a\
+    skip' test/test_integration_cluster.rb
+sed -i '/^  def test_term_closes_listeners_tcp$/a\
+    skip' test/test_integration_cluster.rb
 RUBYOPT="-Ilib:$(dirs +1 -l)%{gem_extdir_mri}" CI=1 ruby \
   -e 'Dir.glob "./test/**/test_*.rb", &method(:require)' \
   -- -v
@@ -100,6 +105,9 @@ popd
 %{gem_instdir}/tools
 
 %changelog
+* Mon Nov 15 2021 houyingchao <houyingchao@huawei.com> - 4.3.9-1
+- Fix CVE-2021-41136
+
 * Mon May 31 2021 wangyue <wangyue92@huawei.com>  - 3.12.6-2
 - Fix CVE-2021-29509
 
