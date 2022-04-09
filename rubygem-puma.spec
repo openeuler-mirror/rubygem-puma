@@ -2,7 +2,7 @@
 %bcond_with ragel
 Name:                rubygem-%{gem_name}
 Version:             4.3.9
-Release:             1
+Release:             2
 Summary:             A simple, fast, threaded, and highly concurrent HTTP 1.1 server
 License:             BSD
 URL:                 http://puma.io
@@ -18,7 +18,8 @@ BuildRequires: 	     rubygem(nio4r)
 %if %{with ragel}
 BuildRequires:       %{_bindir}/ragel
 %endif
-BuildRequires:       gcc
+BuildRequires:       gcc json-c
+
 %description
 A simple, fast, threaded, and highly concurrent HTTP 1.1 server for
 Ruby/Rack applications.
@@ -105,6 +106,9 @@ popd
 %{gem_instdir}/tools
 
 %changelog
+* Sat Apr 09 2022 yangjinghua <yjhdandan@163.com> - 4.3.9-2
+- Add BuildRequirements: json-c
+
 * Mon Nov 15 2021 houyingchao <houyingchao@huawei.com> - 4.3.9-1
 - Fix CVE-2021-41136
 
